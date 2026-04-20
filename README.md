@@ -16,12 +16,64 @@ Jobrythm is a SaaS job costing and quoting dashboard for tradespeople.
 
 ## Setup
 
+### Local Development
+
 ```bash
 npm install
 npm run dev
 ```
 
 The app runs with MSW enabled in development and intercepts `/api/*` requests with mock handlers.
+
+### Docker Deployment
+
+The application is containerized using a multi-stage `Dockerfile` and can be easily managed with `docker-compose`.
+
+#### Prerequisites
+
+- [Docker](https://www.docker.com/get-started)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+#### Running with Docker Compose
+
+By default, the application will be available at `http://localhost:3000`.
+
+1. **Build and start the container:**
+
+   ```bash
+   docker-compose up -d --build
+   ```
+
+2. **Access the application:**
+   Open your browser and navigate to [http://localhost:3000](http://localhost:3000).
+
+#### Configuration & Port Forwarding
+
+The application uses the following default port mappings and environment variables, which can be customized in the `docker-compose.yml` or via a `.env` file:
+
+- **Port Forwarding:** `3000:80` (HOST:CONTAINER). The Nginx server inside the container listens on port `80`, and it's mapped to port `3000` on your host machine.
+- **VITE_API_URL:** The base URL for API requests (default: `/api`).
+- **VITE_API_PROXY_TARGET:** The target backend API for proxying (default: `https://api.jobrythm.aricummings.com`).
+- **HOST_PORT:** Customize the host port (default: `3000`).
+
+Example using a `.env` file:
+```env
+HOST_PORT=4000
+VITE_API_PROXY_TARGET=https://your-api-endpoint.com
+```
+
+#### Manual Docker Build
+
+If you prefer to build the image manually without Compose:
+
+```bash
+docker build -t jobrythm-frontend \
+  --build-arg VITE_API_URL=/api \
+  --build-arg VITE_API_PROXY_TARGET=https://api.jobrythm.aricummings.com \
+  .
+
+docker run -d -p 3000:80 --name jobrythm jobrythm-frontend
+```
 
 ## Build
 
