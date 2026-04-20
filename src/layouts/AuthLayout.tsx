@@ -11,7 +11,7 @@ export const AuthLayout = ({ title, subtitle, children }: AuthLayoutProps) => {
     <div className="page page-center">
       <div className="container container-tight py-4">
         <div className="text-center mb-4">
-          <h1 className="navbar-brand navbar-brand-autodark fs-1">Buildr</h1>
+          <h1 className="navbar-brand navbar-brand-autodark fs-1">Jobrythm</h1>
           <p className="text-secondary">Job costing and quoting for trades</p>
         </div>
         <div className="card card-md">

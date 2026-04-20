@@ -49,7 +49,7 @@ export const AppLayout = () => {
     return parts.length ? parts : ['dashboard'];
   }, [location.pathname]);
 
-  const pageTitle = titleMap[breadcrumb[0]] ?? 'Buildr';
+  const pageTitle = titleMap[breadcrumb[0]] ?? 'Jobrythm';
 
   const navItems: SidebarItem[] = [
     { to: '/dashboard', label: 'Dashboard', icon: IconLayoutDashboard },
@@ -69,7 +69,7 @@ export const AppLayout = () => {
             <button className="navbar-toggler" type="button" onClick={() => setMobileOpen((v) => !v)}>
               <IconMenu2 size={18} />
             </button>
-            <h1 className="navbar-brand navbar-brand-autodark">Buildr</h1>
+            <h1 className="navbar-brand navbar-brand-autodark">Jobrythm</h1>
             <div className="collapse navbar-collapse show">
               <ul className="navbar-nav pt-lg-3">
                 {navItems.map((item, index) => (

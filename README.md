@@ -1,6 +1,6 @@
-# Buildr Frontend
+# Jobrythm Frontend
 
-Buildr is a SaaS job costing and quoting dashboard for tradespeople.
+Jobrythm is a SaaS job costing and quoting dashboard for tradespeople.
 
 ## Stack
 

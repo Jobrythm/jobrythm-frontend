@@ -2,11 +2,11 @@
 
 ## Purpose
 
-This document helps future coding agents work quickly and safely in the Buildr frontend workspace.
+This document helps future coding agents work quickly and safely in the Jobrythm frontend workspace.
 
 ## Project Overview
 
-Buildr is a React + TypeScript SaaS dashboard for trade businesses to manage:
+Jobrythm is a React + TypeScript SaaS dashboard for trade businesses to manage:
 
 - Jobs and line items
 - Clients
@@ -43,7 +43,7 @@ Server requests target `/api/*` and are mocked in development with MSW.
 
 - In `DEV`, MSW worker starts from `src/mocks/browser.ts`.
 - Vite proxies `/api` to `http://localhost:4000` when requests are not intercepted.
-- Auth token is stored with Zustand persist key `buildr-auth`.
+- Auth token is stored with Zustand persist key `jobrythm-auth`.
 - Axios 401 handler clears auth and redirects to `/login`.
 
 ## Implementation Rules for Future Changes

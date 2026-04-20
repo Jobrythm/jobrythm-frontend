@@ -20,7 +20,7 @@ export const useAuthStore = create<AuthState>()(
       clearAuth: () => set({ user: null, token: null, isAuthenticated: false }),
     }),
     {
-      name: 'buildr-auth',
+      name: 'jobrythm-auth',
       partialize: (state) => ({
         user: state.user,
         token: state.token,

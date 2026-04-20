@@ -23,7 +23,7 @@ export const LoginPage = () => {
 
   const { register, handleSubmit, formState: { errors } } = useForm<Values>({
     resolver: zodResolver(schema),
-    defaultValues: { email: 'owner@buildr.app', password: 'password123' },
+    defaultValues: { email: 'owner@jobrythm.com', password: 'password123' },
   });
 
   const mutation = useMutation({
@@ -37,7 +37,7 @@ export const LoginPage = () => {
   });
 
   return (
-    <AuthLayout title="Sign in" subtitle="Access your Buildr workspace">
+    <AuthLayout title="Sign in" subtitle="Access your Jobrythm workspace">
       {mutation.isError ? <ApiErrorAlert error={mutation.error.message} /> : null}
       <form onSubmit={handleSubmit((values) => mutation.mutate(values))}>
         <div className="mb-3">

@@ -13,9 +13,9 @@ const now = new Date('2026-04-20T10:00:00.000Z');
 
 export const mockUser: User = {
   id: 'usr_1',
-  email: 'owner@buildr.app',
+  email: 'owner@jobrythm.com',
   name: 'Ari Cummings',
-  companyName: 'Buildr Trades Ltd',
+  companyName: 'Jobrythm Trades Ltd',
   plan: 'pro',
   createdAt: now.toISOString(),
 };
