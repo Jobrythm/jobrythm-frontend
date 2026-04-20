@@ -5,11 +5,11 @@ services:
       dockerfile: Dockerfile
       args:
         - VITE_API_URL=${VITE_API_URL:-/api}
-        - VITE_API_PROXY_TARGET=${VITE_API_PROXY_TARGET:-http://localhost:4000}
+        - VITE_API_PROXY_TARGET=${VITE_API_PROXY_TARGET:-https://api.jobrythm.aricummings.com}
     ports:
       - "${HOST_PORT:-3000}:80"
     environment:
-      - API_URL=${API_URL:-http://localhost:4000}
+      - API_URL=${API_URL:-https://api.jobrythm.aricummings.com}
     volumes:
       - app_data:/usr/share/nginx/html/data
     restart: always
