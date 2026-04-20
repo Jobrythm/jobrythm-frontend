@@ -52,14 +52,13 @@ By default, the application will be available at `http://localhost:3000`.
 The application uses the following default port mappings and environment variables, which can be customized in the `docker-compose.yml` or via a `.env` file:
 
 - **Port Forwarding:** `3000:80` (HOST:CONTAINER). The Nginx server inside the container listens on port `80`, and it's mapped to port `3000` on your host machine.
-- **VITE_API_URL:** The base URL for API requests (default: `/api`).
-- **VITE_API_PROXY_TARGET:** The target backend API for proxying (default: `https://api.jobrythm.aricummings.com`).
+- **API_URL:** The backend API address used by the Nginx proxy and the application (default: `https://api.jobrythm.aricummings.com`).
 - **HOST_PORT:** Customize the host port (default: `3000`).
 
 Example using a `.env` file:
 ```env
 HOST_PORT=4000
-VITE_API_PROXY_TARGET=https://your-api-endpoint.com
+API_URL=https://your-api-endpoint.com
 ```
 
 #### Manual Docker Build
@@ -72,7 +71,7 @@ docker build -t jobrythm-frontend \
   --build-arg VITE_API_PROXY_TARGET=https://api.jobrythm.aricummings.com \
   .
 
-docker run -d -p 3000:80 --name jobrythm jobrythm-frontend
+docker run -d -p 3000:80 -e API_URL=https://api.jobrythm.aricummings.com --name jobrythm jobrythm-frontend
 ```
 
 ## Build

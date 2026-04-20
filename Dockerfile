@@ -11,8 +11,8 @@ RUN npm install
 COPY . .
 
 # Build-time ARGs for Vite
-ARG VITE_API_URL
-ARG VITE_API_PROXY_TARGET
+ARG VITE_API_URL=/api
+ARG VITE_API_PROXY_TARGET=https://api.jobrythm.aricummings.com
 
 # Make them available as environment variables during build
 ENV VITE_API_URL=$VITE_API_URL
@@ -31,7 +31,7 @@ WORKDIR /usr/share/nginx/html
 COPY --from=build /app/dist .
 
 # Create data directory for persistence
-RUN mkdir -p data && chown nginx:nginx data
+RUN mkdir -p /var/lib/jobrythm/data && chown nginx:nginx /var/lib/jobrythm/data
 
 # Copy custom Nginx configuration template
 COPY nginx.conf.template /etc/nginx/templates/default.conf.template
