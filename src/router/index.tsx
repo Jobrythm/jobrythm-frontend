@@ -17,6 +17,7 @@ import { QuoteDetailPage } from '../features/quotes/pages/QuoteDetailPage';
 import { InvoicesPage } from '../features/invoices/pages/InvoicesPage';
 import { InvoiceDetailPage } from '../features/invoices/pages/InvoiceDetailPage';
 import { SettingsPage } from '../features/settings/pages/SettingsPage';
+import { AdminPage } from '../features/admin/pages/AdminPage';
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
@@ -41,6 +42,7 @@ export const router = createBrowserRouter([
           { path: '/invoices', element: <InvoicesPage /> },
           { path: '/invoices/:id', element: <InvoiceDetailPage /> },
           { path: '/settings', element: <SettingsPage /> },
+          { path: '/admin', element: <AdminPage /> },
         ],
       },
     ],

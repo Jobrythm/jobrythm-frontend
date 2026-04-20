@@ -4,7 +4,7 @@ export interface User {
   name: string;
   companyName?: string;
   logoUrl?: string;
-  plan: 'starter' | 'pro' | 'team';
+  plan: 'starter' | 'pro' | 'team' | 'admin';
   createdAt: string;
 }
 

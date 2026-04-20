@@ -11,6 +11,15 @@ import type {
 
 const now = new Date('2026-04-20T10:00:00.000Z');
 
+export const mockAdmin: User = {
+  id: 'usr_admin',
+  email: 'admin@jobrythm.com',
+  name: 'Admin User',
+  companyName: 'Jobrythm Admin',
+  plan: 'admin',
+  createdAt: now.toISOString(),
+};
+
 export const mockUser: User = {
   id: 'usr_1',
   email: 'owner@jobrythm.com',
@@ -234,6 +243,7 @@ export const getDashboardStatsFromData = (): DashboardStats => {
 
 export const db = {
   user: mockUser,
+  admin: mockAdmin,
   clients: [...mockClients],
   jobs: [...mockJobs],
   quotes: [...mockQuotes],

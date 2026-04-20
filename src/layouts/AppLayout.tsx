@@ -7,6 +7,7 @@ import {
   IconReceipt,
   IconSettings,
   IconUsers,
+  IconShieldLock,
 } from '@tabler/icons-react';
 import { type ComponentType, type ReactNode, useMemo, useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
@@ -35,6 +36,7 @@ const titleMap: Record<string, string> = {
   quotes: 'Quotes',
   invoices: 'Invoices',
   settings: 'Settings',
+  admin: 'Admin Console',
 };
 
 export const AppLayout = () => {
@@ -59,6 +61,7 @@ export const AppLayout = () => {
     { to: '/quotes', label: 'Quotes', icon: IconFileText },
     { to: '/invoices', label: 'Invoices', icon: IconReceipt },
     { divider: true },
+    ...(user?.plan === 'admin' ? [{ to: '/admin', label: 'Admin', icon: IconShieldLock }] : []),
     { to: '/settings', label: 'Settings', icon: IconSettings },
   ];
 

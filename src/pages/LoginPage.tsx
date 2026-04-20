@@ -10,7 +10,7 @@ import { AuthLayout } from '../layouts/AuthLayout';
 import { useAuthStore } from '../store/authStore';
 
 const schema = z.object({
-  email: z.string().email('Valid email required'),
+  email: z.string().min(1, 'Required'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
@@ -23,7 +23,7 @@ export const LoginPage = () => {
 
   const { register, handleSubmit, formState: { errors } } = useForm<Values>({
     resolver: zodResolver(schema),
-    defaultValues: { email: 'owner@jobrythm.com', password: 'password123' },
+    defaultValues: { email: 'admin', password: 'password' },
   });
 
   const mutation = useMutation({
@@ -41,8 +41,8 @@ export const LoginPage = () => {
       {mutation.isError ? <ApiErrorAlert error={mutation.error.message} /> : null}
       <form onSubmit={handleSubmit((values) => mutation.mutate(values))}>
         <div className="mb-3">
-          <label className="form-label">Email</label>
-          <input className="form-control" type="email" {...register('email')} />
+          <label className="form-label">Email or Username</label>
+          <input className="form-control" type="text" {...register('email')} />
           {errors.email ? <small className="text-danger">{errors.email.message}</small> : null}
         </div>
         <div className="mb-3">

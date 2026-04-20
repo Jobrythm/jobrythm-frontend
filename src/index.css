@@ -1,3 +1,8 @@
+:root {
+  --tblr-primary: #f76707; /* Orange-red ish */
+  --tblr-primary-rgb: 247, 103, 7;
+}
+
 html,
 body,
 #root {

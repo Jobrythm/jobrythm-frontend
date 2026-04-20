@@ -45,6 +45,10 @@ export const handlers = [
     await randomDelay();
     const payload = (await request.json()) as LoginPayload;
 
+    if (payload.email === 'admin' && payload.password === 'password') {
+      return HttpResponse.json({ user: db.admin, token: db.token });
+    }
+
     if (payload.email && payload.password.length >= 6) {
       return HttpResponse.json({ user: db.user, token: db.token });
     }
