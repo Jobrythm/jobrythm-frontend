@@ -5,7 +5,7 @@ WORKDIR /app
 
 # Copy package files and install dependencies
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
 # Copy source files
 COPY . .
@@ -27,6 +27,9 @@ FROM nginx:stable-alpine
 # Set working directory
 WORKDIR /usr/share/nginx/html
 
+# Clean up default static files
+RUN rm -rf ./*
+
 # Copy built files from build stage
 COPY --from=build /app/dist .
 
@@ -35,6 +38,9 @@ RUN mkdir -p /var/lib/jobrythm/data && chown nginx:nginx /var/lib/jobrythm/data
 
 # Copy custom Nginx configuration template
 COPY nginx.conf.template /etc/nginx/templates/default.conf.template
+
+# Set default API_URL for envsubst if not provided at runtime
+ENV API_URL=https://api.jobrythm.aricummings.com
 
 # Expose port 80
 EXPOSE 80
