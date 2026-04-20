@@ -1,3 +1,4 @@
+import logoOnly from '../assets/Jobrythm_Logo-Only.png';
 import {
   IconBriefcase,
   IconFileText,
@@ -69,7 +70,9 @@ export const AppLayout = () => {
             <button className="navbar-toggler" type="button" onClick={() => setMobileOpen((v) => !v)}>
               <IconMenu2 size={18} />
             </button>
-            <h1 className="navbar-brand navbar-brand-autodark">Jobrythm</h1>
+            <Link to="/" className="navbar-brand navbar-brand-autodark">
+              <img src={logoOnly} alt="Jobrythm" height="32" />
+            </Link>
             <div className="collapse navbar-collapse show">
               <ul className="navbar-nav pt-lg-3">
                 {navItems.map((item, index) => (
