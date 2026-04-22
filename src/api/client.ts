@@ -1,5 +1,6 @@
 import axios, { AxiosError, type AxiosRequestConfig, type InternalAxiosRequestConfig } from 'axios';
 import { normalizeApiError } from './errors';
+import { resolveApiBaseUrl } from './hosts';
 import { clearSession, getAccessToken, getRefreshPayload, isSessionExpiringSoon, scheduleProactiveRefresh, setSession } from './sessionManager';
 import type { AuthSession, RefreshRequest } from './types';
 
@@ -9,7 +10,7 @@ type RetryConfig = InternalAxiosRequestConfig & {
 };
 
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api',
+  baseURL: resolveApiBaseUrl(),
   timeout: 10000,
 });
 

@@ -1,7 +1,9 @@
 # Jobrythm Frontend API Integration
 
 ## Base Transport
-- Base URL: `VITE_API_URL` fallback `http://localhost:8080/api`
+- Base URL: `VITE_API_URL` if set; otherwise by frontend hostname: `http://localhost:8080/api` (local), `https://api.jobrythm.aricummings.com/api` (aricummings), `https://api.jobrythm.com/api` (production). See `src/api/hosts.ts`.
+- No MSW or mock API; all traffic hits a real backend.
+- **Docker:** the image is built with `VITE_API_URL=/api`. Set `API_URL` to `1`, `2`, or `3` in `docker-compose.yml` to choose the nginx proxy target (see comments there).
 - Auth: bearer token is attached by `src/api/client.ts`
 - Refresh: automatic single-flight refresh on near-expiry and `401` replay
 - Errors: all Axios errors normalized to `ApiError` in `src/api/errors.ts`

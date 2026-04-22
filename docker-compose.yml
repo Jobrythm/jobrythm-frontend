@@ -3,13 +3,17 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        - VITE_API_URL=${VITE_API_URL:-/api}
-        - VITE_API_PROXY_TARGET=${API_URL:-https://api.jobrythm.aricummings.com}
     ports:
       - "${HOST_PORT:-3000}:80"
     environment:
-      - API_URL=${API_URL:-https://api.jobrythm.aricummings.com}
+      # API_URL must be exactly 1, 2, or 3 — selects which backend nginx proxies /api to:
+      #   1 = http://host.docker.internal:8080/api  (backend on your machine; see extra_hosts)
+      #   2 = https://api.jobrythm.aricummings.com/api
+      #   3 = https://api.jobrythm.com/api
+      - API_URL=${API_URL:-2}
+    # Needed for API_URL=1 so the container can reach the host's port 8080
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - app_data:/var/lib/jobrythm/data
     restart: always

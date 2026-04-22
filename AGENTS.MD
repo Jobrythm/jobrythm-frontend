@@ -14,7 +14,7 @@ Jobrythm is a React + TypeScript SaaS dashboard for trade businesses to manage:
 - Invoices
 - Settings and auth flow
 
-Server requests target `/api/*` and are mocked in development with MSW.
+Server requests go to a real Jobrythm API base URL (see `src/api/hosts.ts`); there is no mock API.
 
 ## Tech and Conventions
 
@@ -35,14 +35,12 @@ Server requests target `/api/*` and are mocked in development with MSW.
 - `src/features/*` -> feature hooks/pages/components
 - `src/layouts/AppLayout.tsx` -> sidebar + topbar shell
 - `src/layouts/AuthLayout.tsx` -> auth page wrapper
-- `src/mocks/data.ts` -> seeded mock records
-- `src/mocks/handlers.ts` -> MSW REST handlers
-- `src/main.tsx` -> providers and MSW startup
+- `src/api/hosts.ts` -> which real API base URL to use
+- `src/main.tsx` -> providers
 
 ## Runtime Notes
 
-- In `DEV`, MSW worker starts from `src/mocks/browser.ts`.
-- Vite proxies `/api` to `http://localhost:4000` when requests are not intercepted.
+- Vite can proxy relative `/api` to `http://localhost:8080` (see `vite.config.ts`). The app uses an absolute base URL from `resolveApiBaseUrl()` by default.
 - Auth token is stored with Zustand persist key `jobrythm-auth`.
 - Axios 401 handler clears auth and redirects to `/login`.
 
@@ -68,8 +66,6 @@ npm run lint
 
 If API behavior is modified, verify matching updates in:
 
-- `src/mocks/data.ts`
-- `src/mocks/handlers.ts`
 - relevant `src/api/*.ts` file
 - relevant feature hooks query invalidation
 

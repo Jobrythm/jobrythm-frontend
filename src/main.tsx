@@ -16,20 +16,11 @@ const queryClient = new QueryClient({
   },
 });
 
-const start = async () => {
-  if (import.meta.env.DEV) {
-    const { worker } = await import('./mocks/browser');
-    await worker.start({ onUnhandledRequest: 'bypass' });
-  }
-
-  createRoot(document.getElementById('root')!).render(
-    <StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
-        <Toaster position="top-right" />
-      </QueryClientProvider>
-    </StrictMode>,
-  );
-};
-
-void start();
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+      <Toaster position="top-right" />
+    </QueryClientProvider>
+  </StrictMode>,
+);

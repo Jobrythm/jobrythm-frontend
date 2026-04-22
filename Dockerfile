@@ -10,13 +10,9 @@ RUN npm ci
 # Copy source files
 COPY . .
 
-# Build-time ARGs for Vite
+# Browser calls same-origin /api; nginx proxies using API_URL (1|2|3) at runtime (see docker-compose.yml).
 ARG VITE_API_URL=/api
-ARG VITE_API_PROXY_TARGET=https://api.jobrythm.aricummings.com
-
-# Make them available as environment variables during build
 ENV VITE_API_URL=$VITE_API_URL
-ENV VITE_API_PROXY_TARGET=$VITE_API_PROXY_TARGET
 
 # Build the application
 RUN npm run build
@@ -39,12 +35,15 @@ RUN mkdir -p /var/lib/jobrythm/data && chown nginx:nginx /var/lib/jobrythm/data
 # Copy custom Nginx configuration template
 COPY nginx.conf.template /etc/nginx/templates/default.conf.template
 
-# Set default API_URL for envsubst if not provided at runtime
-ENV API_URL=https://api.jobrythm.aricummings.com
+# Default backend preset if compose does not set API_URL (1 = local, 2 = staging, 3 = prod)
+ENV API_URL=2
+
+COPY docker/docker-entrypoint-wrapper.sh /docker-entrypoint-wrapper.sh
+RUN chmod +x /docker-entrypoint-wrapper.sh
 
 # Expose port 80
 EXPOSE 80
 
-# The default entrypoint for nginx image will use envsubst on files in /etc/nginx/templates/
-# and output them to /etc/nginx/conf.d/
+# Wrapper exports NGINX_API_UPSTREAM from API_URL (1|2|3), then runs stock nginx entrypoint + envsubst
+ENTRYPOINT ["/docker-entrypoint-wrapper.sh"]
 CMD ["nginx", "-g", "daemon off;"]
