@@ -15,6 +15,7 @@ import { useJobs } from '../features/jobs/hooks/useJobs';
 import { useAuth } from '../hooks/useAuth';
 import { TopbarActionContext } from './topbarActionContext';
 import { cn } from '../utils';
+import { logout } from '../api/auth';
 
 type SidebarLinkItem = {
   to: string;
@@ -44,8 +45,9 @@ export const AppLayout = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, clearAuth } = useAuth();
-  const { data: activeJobs = [] } = useJobs({ status: 'active' });
+  const { user, session, clearAuth } = useAuth();
+  const { data: activeJobsResponse } = useJobs({ status: 'active' });
+  const activeJobs = activeJobsResponse?.items ?? [];
 
   const breadcrumb = useMemo(() => {
     const parts = location.pathname.split('/').filter(Boolean);
@@ -111,8 +113,12 @@ export const AppLayout = () => {
                   className="btn btn-sm btn-outline-danger w-100"
                   type="button"
                   onClick={() => {
-                    clearAuth();
-                    navigate('/login');
+                    if (session?.refreshToken) {
+                      void logout({ refreshToken: session.refreshToken }).finally(() => navigate('/login'));
+                    } else {
+                      clearAuth();
+                      navigate('/login');
+                    }
                   }}
                 >
                   Logout

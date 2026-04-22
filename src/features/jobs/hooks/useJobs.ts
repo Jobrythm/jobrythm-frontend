@@ -1,13 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createJob, deleteJob, getJob, getJobs, updateJob } from '../../../api/jobs';
+import { createJob, deleteJob, getJob, getJobs, updateJob, updateJobStatus } from '../../../api/jobs';
 import { createLineItem, deleteLineItem, updateLineItem } from '../../../api/lineItems';
 import { createQuote } from '../../../api/quotes';
 import { createInvoice } from '../../../api/invoices';
-import type { InvoicePayload, JobFilters, JobPayload, LineItemPayload, QuotePayload } from '../../../types';
+import type { InvoicePayload, JobPayload, LineItemPayload, QuotePayload } from '../../../types';
+import type { JobsQuery, UpdateJobStatusRequest } from '../../../api/types';
 
 export const jobsQueryKey = ['jobs'] as const;
 
-export const useJobs = (filters?: JobFilters) => {
+export const useJobs = (filters?: JobsQuery) => {
   return useQuery({
     queryKey: [...jobsQueryKey, filters],
     queryFn: () => getJobs(filters),
@@ -40,6 +41,31 @@ export const useUpdateJob = () => {
     onSuccess: (_, variables) => {
       void queryClient.invalidateQueries({ queryKey: jobsQueryKey });
       void queryClient.invalidateQueries({ queryKey: [...jobsQueryKey, variables.id] });
+      void queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+    },
+  });
+};
+
+export const useUpdateJobStatus = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: UpdateJobStatusRequest }) => updateJobStatus(id, payload),
+    onMutate: async ({ id, payload }) => {
+      await queryClient.cancelQueries({ queryKey: jobsQueryKey });
+      const previousJobs = queryClient.getQueriesData({ queryKey: jobsQueryKey });
+      queryClient.setQueriesData({ queryKey: jobsQueryKey }, (existing: unknown) => {
+        if (!existing || typeof existing !== 'object') return existing;
+        const list = existing as { items?: Array<{ id: string; status: string }> };
+        if (!Array.isArray(list.items)) return existing;
+        return { ...list, items: list.items.map((job) => (job.id === id ? { ...job, status: payload.status } : job)) };
+      });
+      return { previousJobs };
+    },
+    onError: (_err, _variables, context) => {
+      context?.previousJobs?.forEach(([key, value]) => queryClient.setQueryData(key, value));
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: jobsQueryKey });
       void queryClient.invalidateQueries({ queryKey: ['dashboard'] });
     },
   });

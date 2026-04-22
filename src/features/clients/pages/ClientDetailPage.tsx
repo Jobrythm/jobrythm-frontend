@@ -22,7 +22,8 @@ type Values = z.infer<typeof schema>;
 export const ClientDetailPage = () => {
   const { id } = useParams();
   const { data: client, isLoading } = useClient(id);
-  const { data: jobs = [] } = useJobs();
+  const { data: jobsResponse } = useJobs();
+  const jobs = jobsResponse?.items ?? [];
   const updateClient = useUpdateClient();
 
   const { register, handleSubmit, formState: { errors } } = useForm<Values>({

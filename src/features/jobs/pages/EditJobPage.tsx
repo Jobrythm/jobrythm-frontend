@@ -8,7 +8,8 @@ import { useJob, useUpdateJob } from '../hooks/useJobs';
 export const EditJobPage = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { data: clients = [], isLoading: isLoadingClients } = useClients();
+  const { data: clientsResponse, isLoading: isLoadingClients } = useClients();
+  const clients = clientsResponse?.items ?? [];
   const { data: job, isLoading: isLoadingJob } = useJob(id);
   const updateMutation = useUpdateJob();
 

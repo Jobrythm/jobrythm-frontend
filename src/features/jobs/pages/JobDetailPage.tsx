@@ -9,7 +9,7 @@ import { CurrencyDisplay } from '../../../components/CurrencyDisplay';
 import { LoadingSpinner } from '../../../components/LoadingSpinner';
 import { StatusBadge } from '../../../components/StatusBadge';
 import { formatDate, formatPercent, getMarginColor } from '../../../utils';
-import { useInvoices, useUpdateInvoice } from '../../invoices/hooks/useInvoices';
+import { useInvoices } from '../../invoices/hooks/useInvoices';
 import { LineItemTable } from '../components/LineItemTable';
 import {
   useCreateLineItem,
@@ -17,9 +17,11 @@ import {
   useGenerateInvoice,
   useGenerateQuote,
   useJob,
+  useUpdateJobStatus,
   useUpdateJob,
 } from '../hooks/useJobs';
-import { useQuotes, useUpdateQuote } from '../../quotes/hooks/useQuotes';
+import { useDownloadQuotePdf, useQuotes, useSendQuote, useUpdateQuote } from '../../quotes/hooks/useQuotes';
+import { useDownloadInvoicePdf, useMarkInvoicePaid, useSendInvoice } from '../../invoices/hooks/useInvoices';
 import type { JobStatus } from '../../../types';
 
 const statusOptions: JobStatus[] = ['draft', 'quoted', 'active', 'completed', 'invoiced'];
@@ -30,17 +32,33 @@ export const JobDetailPage = () => {
   const [deleteLineItemId, setDeleteLineItemId] = useState<string | null>(null);
   const { data: job, isLoading, isError, error } = useJob(id);
   const updateJob = useUpdateJob();
+  const updateJobStatus = useUpdateJobStatus();
   const createLineItem = useCreateLineItem();
   const deleteLineItem = useDeleteLineItem();
-  const { data: quotes = [] } = useQuotes();
-  const { data: invoices = [] } = useInvoices();
+  const { data: quotesResponse } = useQuotes();
+  const { data: invoicesResponse } = useInvoices();
   const generateQuote = useGenerateQuote();
   const generateInvoice = useGenerateInvoice();
   const updateQuote = useUpdateQuote();
-  const updateInvoice = useUpdateInvoice();
+  const sendQuote = useSendQuote();
+  const sendInvoice = useSendInvoice();
+  const markInvoicePaid = useMarkInvoicePaid();
+  const downloadQuotePdf = useDownloadQuotePdf();
+  const downloadInvoicePdf = useDownloadInvoicePdf();
 
-  const quote = useMemo(() => quotes.find((item) => item.jobId === id), [quotes, id]);
-  const invoice = useMemo(() => invoices.find((item) => item.jobId === id), [invoices, id]);
+  const quote = useMemo(() => (quotesResponse?.items ?? []).find((item) => item.jobId === id), [quotesResponse?.items, id]);
+  const invoice = useMemo(() => (invoicesResponse?.items ?? []).find((item) => item.jobId === id), [invoicesResponse?.items, id]);
+
+  const openPdfBlob = (blob: Blob, fileName: string) => {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    link.rel = 'noopener noreferrer';
+    link.target = '_blank';
+    link.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
 
   if (isLoading) return <LoadingSpinner label="Loading job..." />;
   if (isError) return <ApiErrorAlert error={(error as Error).message} />;
@@ -72,7 +90,7 @@ export const JobDetailPage = () => {
                 className="form-select"
                 value={job.status}
                 onChange={(event) => {
-                  updateJob.mutate(
+                  updateJobStatus.mutate(
                     { id: job.id, payload: { status: event.target.value as JobStatus } },
                     { onSuccess: () => toast.success('Status updated') },
                   );
@@ -187,17 +205,28 @@ export const JobDetailPage = () => {
                         <p className="text-secondary">Valid until {formatDate(quote.validUntil)}</p>
                         <h2><CurrencyDisplay cents={quote.totalGross} /></h2>
                         <div className="btn-list">
-                          <button className="btn btn-outline-primary"><IconFileText size={16} className="me-1" /> Preview PDF</button>
+                          <button
+                            className="btn btn-outline-primary"
+                            onClick={() => {
+                              downloadQuotePdf.mutate(quote.id, {
+                                onSuccess: (blob) => openPdfBlob(blob, `${quote.quoteNumber}.pdf`),
+                                onError: (err: Error) => toast.error(err.message),
+                              });
+                            }}
+                          >
+                            <IconFileText size={16} className="me-1" /> Preview PDF
+                          </button>
                           <button
                             className="btn btn-primary"
+                            disabled={sendQuote.isPending}
                             onClick={() =>
-                              updateQuote.mutate(
-                                { id: quote.id, payload: { status: 'sent' } },
-                                { onSuccess: () => toast.success('Quote sent') },
-                              )
+                              sendQuote.mutate(quote.id, {
+                                onSuccess: (result) => toast.success(result.message ?? 'Quote sent'),
+                                onError: (err: Error) => toast.error(err.message),
+                              })
                             }
                           >
-                            Send to Client
+                            {sendQuote.isPending ? 'Sending...' : 'Send to Client'}
                           </button>
                         </div>
                         <div className="btn-list mt-3">
@@ -270,11 +299,31 @@ export const JobDetailPage = () => {
                     <p className="text-secondary">Due {formatDate(invoice.dueDate)}</p>
                     <h2><CurrencyDisplay cents={invoice.totalGross} /></h2>
                     <div className="btn-list">
-                      <button className="btn btn-outline-primary"><IconReceipt size={16} className="me-1" /> Preview PDF</button>
+                      <button
+                        className="btn btn-outline-primary"
+                        onClick={() => {
+                          downloadInvoicePdf.mutate(invoice.id, {
+                            onSuccess: (blob) => openPdfBlob(blob, `${invoice.invoiceNumber}.pdf`),
+                            onError: (err: Error) => toast.error(err.message),
+                          });
+                        }}
+                      >
+                        <IconReceipt size={16} className="me-1" /> Preview PDF
+                      </button>
+                      <button
+                        className="btn btn-primary"
+                        disabled={sendInvoice.isPending}
+                        onClick={() => sendInvoice.mutate(invoice.id, {
+                          onSuccess: (result) => toast.success(result.message ?? 'Invoice sent'),
+                          onError: (err: Error) => toast.error(err.message),
+                        })}
+                      >
+                        {sendInvoice.isPending ? 'Sending...' : 'Send to Client'}
+                      </button>
                       {invoice.status !== 'paid' ? (
                         <button
                           className="btn btn-primary"
-                          onClick={() => updateInvoice.mutate({ id: invoice.id, payload: { status: 'paid' } }, { onSuccess: () => toast.success('Invoice marked as paid') })}
+                          onClick={() => markInvoicePaid.mutate(invoice.id, { onSuccess: () => toast.success('Invoice marked as paid') })}
                         >
                           Mark as paid
                         </button>

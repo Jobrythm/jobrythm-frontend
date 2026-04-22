@@ -11,7 +11,8 @@ const statuses: Array<'all' | Invoice['status']> = ['all', 'draft', 'sent', 'pai
 
 export const InvoicesPage = () => {
   const [status, setStatus] = useState<'all' | Invoice['status']>('all');
-  const { data: invoices = [], isLoading } = useInvoices(status === 'all' ? undefined : { status });
+  const { data: invoicesResponse, isLoading } = useInvoices(status === 'all' ? undefined : { status });
+  const invoices = invoicesResponse?.items ?? [];
 
   return (
     <div className="card">

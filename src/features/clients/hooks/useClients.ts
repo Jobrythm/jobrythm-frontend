@@ -1,13 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createClient, getClient, getClients, updateClient } from '../../../api/clients';
+import { createClient, deleteClient, getClient, getClients, updateClient } from '../../../api/clients';
 import type { ClientPayload } from '../../../types';
+import type { ClientsQuery } from '../../../api/types';
 
 export const clientsQueryKey = ['clients'] as const;
 
-export const useClients = () => {
+export const useClients = (query?: ClientsQuery) => {
   return useQuery({
-    queryKey: clientsQueryKey,
-    queryFn: getClients,
+    queryKey: [...clientsQueryKey, query],
+    queryFn: () => getClients(query),
   });
 };
 
@@ -36,6 +37,16 @@ export const useUpdateClient = () => {
     onSuccess: (_, variables) => {
       void queryClient.invalidateQueries({ queryKey: clientsQueryKey });
       void queryClient.invalidateQueries({ queryKey: [...clientsQueryKey, variables.id] });
+    },
+  });
+};
+
+export const useDeleteClient = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteClient(id),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: clientsQueryKey });
     },
   });
 };

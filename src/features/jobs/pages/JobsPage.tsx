@@ -28,7 +28,7 @@ export const JobsPage = () => {
   }, [setTopbarAction]);
 
   const filtered = useMemo(() => {
-    const list = data ?? [];
+    const list = data?.items ?? [];
     if (!search) return list;
     const needle = search.toLowerCase();
     return list.filter(

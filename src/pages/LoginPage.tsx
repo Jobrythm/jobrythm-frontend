@@ -5,6 +5,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import toast from 'react-hot-toast';
 import { login } from '../api/auth';
+import { getApiErrorMessage, normalizeApiError } from '../api/errors';
 import { ApiErrorAlert } from '../components/ApiErrorAlert';
 import { AuthLayout } from '../layouts/AuthLayout';
 import { useAuthStore } from '../store/authStore';
@@ -28,12 +29,18 @@ export const LoginPage = () => {
 
   const mutation = useMutation({
     mutationFn: login,
-    onSuccess: ({ user, token }) => {
-      setAuth(user, token);
+    onSuccess: ({ user, session }) => {
+      setAuth(user, session);
       toast.success('Welcome back');
       navigate(location.state?.from?.pathname ?? '/dashboard');
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => {
+      const normalized = normalizeApiError(error);
+      toast.error(getApiErrorMessage(error));
+      if (normalized.status === 429) {
+        toast('Too many login attempts. Please wait before trying again.');
+      }
+    },
   });
 
   return (

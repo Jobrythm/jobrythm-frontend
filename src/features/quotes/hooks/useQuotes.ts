@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getQuote, getQuotes, updateQuote } from '../../../api/quotes';
-import type { QuoteFilters, QuotePayload } from '../../../types';
+import { downloadQuotePdf, getQuote, getQuotes, sendQuote, updateQuote } from '../../../api/quotes';
+import type { QuotePayload } from '../../../types';
+import type { QuotesQuery } from '../../../api/types';
 
 export const quotesQueryKey = ['quotes'] as const;
 
-export const useQuotes = (filters?: QuoteFilters) => {
+export const useQuotes = (filters?: QuotesQuery) => {
   return useQuery({
     queryKey: [...quotesQueryKey, filters],
     queryFn: () => getQuotes(filters),
@@ -27,6 +28,22 @@ export const useUpdateQuote = () => {
       void queryClient.invalidateQueries({ queryKey: quotesQueryKey });
       void queryClient.invalidateQueries({ queryKey: [...quotesQueryKey, variables.id] });
     },
+  });
+};
+
+export const useSendQuote = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => sendQuote(id),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: quotesQueryKey });
+    },
+  });
+};
+
+export const useDownloadQuotePdf = () => {
+  return useMutation({
+    mutationFn: (id: string) => downloadQuotePdf(id),
   });
 };
 

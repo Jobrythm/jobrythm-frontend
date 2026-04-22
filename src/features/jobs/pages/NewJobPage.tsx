@@ -7,7 +7,8 @@ import { useCreateJob } from '../hooks/useJobs';
 
 export const NewJobPage = () => {
   const navigate = useNavigate();
-  const { data: clients = [], isLoading } = useClients();
+  const { data: clientsResponse, isLoading } = useClients();
+  const clients = clientsResponse?.items ?? [];
   const createMutation = useCreateJob();
 
   if (isLoading) return <LoadingSpinner label="Loading clients..." />;

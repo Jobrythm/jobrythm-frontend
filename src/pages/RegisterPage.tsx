@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import toast from 'react-hot-toast';
 import { register as registerUser } from '../api/auth';
+import { getApiErrorMessage, normalizeApiError } from '../api/errors';
 import { ApiErrorAlert } from '../components/ApiErrorAlert';
 import { AuthLayout } from '../layouts/AuthLayout';
 import { useAuthStore } from '../store/authStore';
@@ -14,7 +15,13 @@ const schema = z
     name: z.string().min(1, 'Name is required'),
     companyName: z.string().optional(),
     email: z.string().email('Valid email required'),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
+    password: z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .regex(/[a-z]/, 'Password must include a lowercase letter')
+      .regex(/[A-Z]/, 'Password must include an uppercase letter')
+      .regex(/\d/, 'Password must include a digit')
+      .regex(/[^A-Za-z0-9]/, 'Password must include a special character'),
     confirmPassword: z.string().min(6, 'Please confirm password'),
   })
   .refine((values) => values.password === values.confirmPassword, {
@@ -40,12 +47,18 @@ export const RegisterPage = () => {
         email: values.email,
         password: values.password,
       }),
-    onSuccess: ({ user, token }) => {
-      setAuth(user, token);
+    onSuccess: ({ user, session }) => {
+      setAuth(user, session);
       toast.success('Account created');
       navigate('/dashboard');
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => {
+      const normalized = normalizeApiError(error);
+      toast.error(getApiErrorMessage(error));
+      if (normalized.status === 429) {
+        toast('Too many attempts. Please wait before retrying.');
+      }
+    },
   });
 
   return (

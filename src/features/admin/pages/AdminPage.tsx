@@ -5,8 +5,10 @@ import { TableSkeleton } from '../../../components/TableSkeleton';
 import { CurrencyDisplay } from '../../../components/CurrencyDisplay';
 
 export const AdminPage = () => {
-  const { data: clients = [], isLoading: loadingClients } = useClients();
-  const { data: jobs = [], isLoading: loadingJobs } = useJobs();
+  const { data: clientsResponse, isLoading: loadingClients } = useClients();
+  const { data: jobsResponse, isLoading: loadingJobs } = useJobs();
+  const clients = clientsResponse?.items ?? [];
+  const jobs = jobsResponse?.items ?? [];
 
   if (loadingClients || loadingJobs) return <TableSkeleton rows={6} columns={6} />;
 

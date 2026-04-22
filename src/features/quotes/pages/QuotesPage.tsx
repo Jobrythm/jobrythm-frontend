@@ -11,7 +11,8 @@ const statuses: Array<'all' | Quote['status']> = ['all', 'draft', 'sent', 'accep
 
 export const QuotesPage = () => {
   const [status, setStatus] = useState<'all' | Quote['status']>('all');
-  const { data: quotes = [], isLoading } = useQuotes(status === 'all' ? undefined : { status });
+  const { data: quotesResponse, isLoading } = useQuotes(status === 'all' ? undefined : { status });
+  const quotes = quotesResponse?.items ?? [];
 
   return (
     <div className="card">

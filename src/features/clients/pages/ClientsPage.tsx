@@ -7,8 +7,10 @@ import { useJobs } from '../../jobs/hooks/useJobs';
 import { useClients } from '../hooks/useClients';
 
 export const ClientsPage = () => {
-  const { data: clients = [], isLoading } = useClients();
-  const { data: jobs = [] } = useJobs();
+  const { data: clientsResponse, isLoading } = useClients();
+  const { data: jobsResponse } = useJobs();
+  const clients = clientsResponse?.items ?? [];
+  const jobs = jobsResponse?.items ?? [];
 
   if (isLoading) return <TableSkeleton rows={6} columns={6} />;
 
